@@ -21,17 +21,18 @@ const CONFIG = {
     subtitle: 'ضد الأشعة الزرقاء • UV400 • 4 مواسم 🔥',
     basePrice: 1900,
     currency: 'DA',
- colors: ['Transparent', 'Platine', 'Gold'],
-imageUrl: 'https://i.imgur.com/7vIr21J.jpg',
-images: {
-  'Transparent': 'https://i.imgur.com/7vIr21J.jpg',
-  'Platine':     'https://i.imgur.com/7vIr21J.jpg',
-  'Gold':        'https://i.imgur.com/7vIr21J.jpg',
-}
+    colors: ['Transparent', 'Platine', 'Gold'],
+    imageUrl: 'https://i.imgur.com/7vIr21J.jpg',
+    images: {
+      'Transparent': 'https://i.imgur.com/7vIr21J.jpg',
+      'Platine':     'https://i.imgur.com/7vIr21J.jpg',
+      'Gold':        'https://i.imgur.com/7vIr21J.jpg',
+    },
+  },
   bundles: [
-    { qty: 1, price: 1900,  saving: 0,   label: '1 قطعة', badge: null },
-    { qty: 2, price: 3800,  saving: 0,   label: '2 قطع',  badge: null },
-    { qty: 3, price: 5250,  saving: 450, label: '3 قطع',  badge: '🔥 وفر 450 DA' },
+    { qty: 1, price: 1900, saving: 0,   label: '1 قطعة', badge: null },
+    { qty: 2, price: 3800, saving: 0,   label: '2 قطع',  badge: null },
+    { qty: 3, price: 5250, saving: 450, label: '3 قطع',  badge: '🔥 وفر 450 DA' },
   ],
   shippingFees: {
     'أدرار': 800, 'الشلف': 400, 'الأغواط': 600, 'أم البواقي': 500,
@@ -54,7 +55,6 @@ images: {
 const app = express();
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
-// ── Middleware ────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -111,7 +111,7 @@ app.post('/api/orders', (req, res) => {
   };
   orders.unshift(order);
   saveOrders(orders);
-  console.log(`✅ طلب جديد: ${firstName} - ${wilaya} - ${totalPrice} DA`);
+  console.log('✅ طلب جديد:', firstName, wilaya, totalPrice, 'DA');
   res.json({ success: true, orderId: order.id });
 });
 
@@ -178,26 +178,26 @@ app.get('/admin', requireAdmin, (req, res) => {
   const orders = readOrders();
   const statusColors = {
     'En attente': '#f0c040', 'Confirmé': '#00cc66',
-    'Expédié': '#4488ff', 'Annulé': '#ff4444'
+    'Expédié': '#4488ff', 'Annulé': '#ff4444',
   };
   const stats = {
     total:     orders.length,
     confirmed: orders.filter(o => o.status === 'Confirmé').length,
     shipped:   orders.filter(o => o.status === 'Expédié').length,
-    revenue:   orders.filter(o => o.status !== 'Annulé').reduce((s, o) => s + (Number(o.totalPrice) || 0), 0)
+    revenue:   orders.filter(o => o.status !== 'Annulé').reduce((s, o) => s + (Number(o.totalPrice) || 0), 0),
   };
 
   const rows = orders.map(o => `
     <tr id="row-${o.id}">
       <td>${new Date(o.createdAt).toLocaleDateString('ar-DZ')}</td>
       <td><strong>${o.firstName}</strong><br><small>${o.phone}</small></td>
-      <td>${o.wilaya}<br><small>${o.commune||''}</small></td>
-      <td>${o.color||'-'} × ${o.qty||1}</td>
-      <td><strong>${Number(o.totalPrice).toLocaleString()} DA</strong><br><small>توصيل: ${o.shippingFee||0} DA</small></td>
+      <td>${o.wilaya}<br><small>${o.commune || ''}</small></td>
+      <td>${o.color || '-'} × ${o.qty || 1}</td>
+      <td><strong>${Number(o.totalPrice).toLocaleString()} DA</strong><br><small>توصيل: ${o.shippingFee || 0} DA</small></td>
       <td>
-        <select onchange="updateStatus('${o.id}',this.value)" style="background:#1a1a1a;color:${statusColors[o.status]||'#fff'};border:1px solid #333;padding:4px 8px;border-radius:6px;cursor:pointer">
+        <select onchange="updateStatus('${o.id}',this.value)" style="background:#1a1a1a;color:${statusColors[o.status] || '#fff'};border:1px solid #333;padding:4px 8px;border-radius:6px;cursor:pointer">
           ${['En attente','Confirmé','Expédié','Annulé'].map(s =>
-            `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
         </select>
       </td>
       <td><button onclick="deleteOrder('${o.id}')" style="background:#ff4444;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer">حذف</button></td>
@@ -252,6 +252,6 @@ function deleteOrder(id) {
 
 // ── Start ─────────────────────────────────────────────────────
 app.listen(CONFIG.port, () => {
-  console.log(`\n✅ الموقع شغال على http://localhost:${CONFIG.port}`);
-  console.log(`📊 Admin: http://localhost:${CONFIG.port}/admin\n`);
+  console.log('✅ الموقع شغال على http://localhost:' + CONFIG.port);
+  console.log('📊 Admin: http://localhost:' + CONFIG.port + '/admin');
 });
