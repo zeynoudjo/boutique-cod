@@ -1,299 +1,262 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظارات Premium - LUX OPTIC</title>
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: Arial, sans-serif; background:#0a0a0a; color:#fff; direction:rtl; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Commandez maintenant avec livraison partout en Algérie — Paiement à la livraison" />
+  <title>Montre Élégante Pro — Livraison Algérie</title>
 
-header { background: linear-gradient(135deg,#1a1a1a,#2d2500); padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #c9a227; }
-.logo { font-size:22px; font-weight:bold; color:#c9a227; }
-.badge-header { background:#c9a227; color:#000; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold; }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-.hero { background:#111; padding:24px 20px 16px; text-align:center; }
-.hero h1 { font-size:26px; color:#fff; margin-bottom:6px; }
-.hero h1 span { color:#c9a227; }
-.hero p { color:#aaa; font-size:14px; margin-bottom:20px; }
-
-.gallery { display:flex; gap:10px; overflow-x:auto; padding:0 20px 16px; scroll-snap-type:x mandatory; }
-.gallery::-webkit-scrollbar { height:4px; }
-.gallery::-webkit-scrollbar-thumb { background:#c9a227; border-radius:2px; }
-.gallery img { width:270px; min-width:270px; height:200px; object-fit:cover; border-radius:12px; border:2px solid #333; scroll-snap-align:start; cursor:pointer; transition:border-color .3s; }
-.gallery img:hover, .gallery img.active { border-color:#c9a227; }
-
-.badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:12px 20px; }
-.badge { background:#1a1a1a; border:1px solid #c9a22755; color:#c9a227; padding:5px 12px; border-radius:20px; font-size:12px; }
-
-.section { padding:0 20px 24px; max-width:580px; margin:0 auto; }
-.product-name { font-size:20px; font-weight:bold; margin-bottom:8px; }
-.product-desc { color:#999; font-size:14px; margin-bottom:20px; line-height:1.7; }
-
-.sec-title { font-size:13px; color:#c9a227; font-weight:bold; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
-
-.color-options { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
-.color-btn { padding:8px 18px; border-radius:8px; border:2px solid #333; background:#1a1a1a; color:#fff; cursor:pointer; font-size:14px; transition:all .2s; }
-.color-btn.selected { border-color:#c9a227; background:#2d2500; color:#c9a227; }
-
-.bundles { display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
-.bundle { background:#1a1a1a; border:2px solid #333; border-radius:12px; padding:14px 16px; cursor:pointer; transition:all .2s; display:flex; justify-content:space-between; align-items:center; }
-.bundle.selected { border-color:#c9a227; background:#2d2500; }
-.bundle-qty { font-size:16px; font-weight:bold; }
-.bundle-badge { background:#c9a227; color:#000; font-size:11px; padding:2px 8px; border-radius:10px; font-weight:bold; display:inline-block; margin-top:4px; }
-.bundle-price { font-size:18px; font-weight:bold; color:#c9a227; }
-.bundle-old { font-size:12px; color:#666; text-decoration:line-through; text-align:left; }
-
-.total-box { background:linear-gradient(135deg,#2d2500,#1a1a1a); border:1px solid #c9a227; border-radius:12px; padding:16px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; }
-.total-label { font-size:14px; color:#aaa; }
-.total-price { font-size:26px; font-weight:bold; color:#c9a227; }
-
-.form-group { margin-bottom:14px; }
-.form-group label { display:block; font-size:13px; color:#aaa; margin-bottom:6px; }
-.form-group input, .form-group select { width:100%; background:#1a1a1a; border:1px solid #333; color:#fff; padding:12px 14px; border-radius:8px; font-size:15px; outline:none; transition:border-color .2s; }
-.form-group input:focus, .form-group select:focus { border-color:#c9a227; }
-.form-group select option { background:#1a1a1a; }
-
-.order-btn { width:100%; background:linear-gradient(135deg,#c9a227,#f0c040); color:#000; border:none; padding:16px; border-radius:12px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:8px; transition:transform .15s; }
-.order-btn:hover { transform:scale(1.02); }
-.order-btn:active { transform:scale(0.98); }
-.order-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-
-.success-msg { display:none; background:linear-gradient(135deg,#003300,#1a1a1a); border:1px solid #00cc66; border-radius:12px; padding:24px; text-align:center; margin-top:16px; }
-.success-msg .icon { font-size:48px; margin-bottom:10px; }
-.success-msg h3 { color:#00cc66; font-size:20px; margin-bottom:8px; }
-.success-msg p { color:#aaa; font-size:14px; }
-
-.trust { padding:20px; display:flex; justify-content:center; gap:20px; flex-wrap:wrap; border-top:1px solid #222; }
-.trust-item { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:12px; color:#aaa; }
-.trust-item span:first-child { font-size:22px; }
-
-.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#c9a227; color:#000; padding:10px 24px; border-radius:20px; font-weight:bold; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:999; }
-.toast.show { opacity:1; }
-</style>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>
-  <div class="logo">✨ LUX OPTIC</div>
-  <div class="badge-header">🇩🇿 توصيل لكل الجزائر</div>
-</header>
-
-<div class="hero">
-  <h1>نظارات <span>Premium</span> 🕶️</h1>
-  <p>Anti Blue Light • UV400 • 4 مواسم</p>
-  <div class="gallery">
-    <img src="https://i.ibb.co/sd7pcbS6/CARTIER-1.jpg" alt="نظارة 1" class="active" onclick="selectImg(this)">
-    <img src="https://i.ibb.co/ycCWLtgd/CARTIER-2.jpg" alt="نظارة 2" onclick="selectImg(this)">
-    <img src="https://i.ibb.co/6R8z1f2L/CARTIER.jpg" alt="نظارة 3" onclick="selectImg(this)">
-  </div>
-</div>
-
-<div class="badges">
-  <span class="badge">🛡️ UV 400</span>
-  <span class="badge">💙 Anti Blue Light</span>
-  <span class="badge">🌟 4 Saisons</span>
-  <span class="badge">✨ Rimless Premium</span>
-</div>
-
-<div class="section">
-  <div class="product-name">نظارات Premium Rimless</div>
-  <div class="product-desc">نظارات عالية الجودة بإطار ذهبي فاخر، عدسات بدون إطار تحمي من الأشعة الزرقاء والأشعة فوق البنفسجية UV400. مناسبة 4 مواسم 🔥</div>
-
-  <div class="sec-title">اختر اللون</div>
-  <div class="color-options">
-    <button class="color-btn selected" onclick="selectColor(this,'Transparent')">Transparent</button>
-    <button class="color-btn" onclick="selectColor(this,'Platine')">Platine</button>
-    <button class="color-btn" onclick="selectColor(this,'Gold')">Gold</button>
+  <!-- ══════════════════════════════════════
+       TOP ANNOUNCEMENT BAR
+  ══════════════════════════════════════ -->
+  <div class="announcement-bar">
+    <div class="announcement-inner">
+      <span class="announcement-dot"></span>
+      🚚 Livraison rapide partout en Algérie · Paiement à la livraison (COD)
+      <span class="announcement-dot"></span>
+    </div>
   </div>
 
-  <div class="sec-title">اختر الكمية</div>
-  <div class="bundles">
-    <div class="bundle selected" onclick="selectBundle(this,1,1900)">
-      <div><div class="bundle-qty">1 قطعة</div></div>
-      <div class="bundle-price">1,900 DA</div>
-    </div>
-    <div class="bundle" onclick="selectBundle(this,2,3800)">
-      <div><div class="bundle-qty">2 قطع</div></div>
-      <div class="bundle-price">3,800 DA</div>
-    </div>
-    <div class="bundle" onclick="selectBundle(this,3,5250)">
-      <div>
-        <div class="bundle-qty">3 قطع</div>
-        <span class="bundle-badge">🔥 وفر 450 DA</span>
+  <!-- ══════════════════════════════════════
+       HEADER / NAV
+  ══════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">
+        <span class="logo-icon">◆</span>
+        <span id="header-brand">Boutique</span>
       </div>
-      <div>
-        <div class="bundle-price">5,250 DA</div>
-        <div class="bundle-old">5,700 DA</div>
+      <div class="header-trust">
+        <span class="trust-pill">🔒 100% Sécurisé</span>
+        <span class="trust-pill">✅ Satisfait ou Remboursé</span>
       </div>
     </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       MAIN PRODUCT SECTION
+  ══════════════════════════════════════ -->
+  <main class="main-content">
+    <div class="container product-layout">
+
+      <!-- ── LEFT: Product Image ─────────────────────── -->
+      <div class="product-media">
+        <div class="image-wrap">
+          <!-- Badge overlay -->
+          <div class="image-badge" id="hero-badge">Nouveau</div>
+          <img
+            id="product-image"
+            src="https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&q=90"
+            alt="Produit"
+            loading="eager"
+          />
+        </div>
+
+        <!-- Trust badges under image -->
+        <div class="media-trust">
+          <div class="trust-item"><span>🛡️</span><span>Garantie 30 jours</span></div>
+          <div class="trust-item"><span>📦</span><span>Livraison sécurisée</span></div>
+          <div class="trust-item"><span>💳</span><span>COD uniquement</span></div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: Product Info + Checkout ─────────── -->
+      <div class="product-info">
+
+        <!-- Product Header -->
+        <div class="product-header">
+          <div class="product-eyebrow" id="product-subtitle">Édition Limitée · Algérie</div>
+          <h1 class="product-title" id="product-title">Montre Élégante Pro</h1>
+          <div class="product-price-row">
+            <span class="product-price" id="display-price">2 900 DZD</span>
+            <span class="product-rating">★★★★★ <span class="rating-count">(218)</span></span>
+          </div>
+          <div class="product-tagline">⚡ Stock limité — Commandez maintenant avant rupture</div>
+        </div>
+
+        <!-- ── STEP 1: Bundle / Quantity Selector ────── -->
+        <div class="form-section">
+          <div class="step-label"><span class="step-num">1</span> Choisissez votre offre</div>
+
+          <div class="bundle-grid" id="bundle-grid">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <!-- ── STEP 2: Variants ───────────────────────── -->
+        <div class="form-section">
+          <div class="step-label"><span class="step-num">2</span> Options du produit</div>
+
+          <div class="variants-row">
+            <!-- Color -->
+            <div class="variant-group">
+              <label class="variant-label">Couleur <span id="selected-color" class="variant-selected"></span></label>
+              <div class="color-btn-group" id="color-buttons">
+                <!-- Populated by app.js -->
+              </div>
+            </div>
+
+            <!-- Size -->
+            <div class="variant-group">
+              <label class="variant-label">Taille <span id="selected-size" class="variant-selected"></span></label>
+              <div class="size-btn-group" id="size-buttons">
+                <!-- Populated by app.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: Customer Info ──────────────────── -->
+        <div class="form-section">
+          <div class="step-label"><span class="step-num">3</span> Vos informations de livraison</div>
+
+          <form id="checkout-form" novalidate>
+
+            <div class="fields-row">
+              <!-- First Name -->
+              <div class="field-group">
+                <label class="field-label" for="firstName">Prénom <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  class="field-input"
+                  placeholder="Votre prénom"
+                  autocomplete="given-name"
+                  required
+                />
+                <span class="field-error" id="err-firstName"></span>
+              </div>
+
+              <!-- Phone -->
+              <div class="field-group">
+                <label class="field-label" for="phone">Téléphone <span class="req">*</span></label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  class="field-input"
+                  placeholder="06 XX XX XX XX"
+                  autocomplete="tel"
+                  maxlength="10"
+                  required
+                />
+                <span class="field-error" id="err-phone"></span>
+              </div>
+            </div>
+
+            <div class="fields-row">
+              <!-- Wilaya -->
+              <div class="field-group">
+                <label class="field-label" for="wilaya">Wilaya <span class="req">*</span></label>
+                <div class="select-wrap">
+                  <select id="wilaya" name="wilaya" class="field-input" required>
+                    <option value="">Sélectionnez votre wilaya</option>
+                    <!-- Populated by app.js -->
+                  </select>
+                </div>
+                <span class="field-error" id="err-wilaya"></span>
+              </div>
+
+              <!-- Commune -->
+              <div class="field-group">
+                <label class="field-label" for="commune">Commune / Ville <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="commune"
+                  name="commune"
+                  class="field-input"
+                  placeholder="Votre commune"
+                  required
+                />
+                <span class="field-error" id="err-commune"></span>
+              </div>
+            </div>
+
+            <!-- ── Order Summary ─────────────────────── -->
+            <div class="order-summary" id="order-summary">
+              <div class="summary-title">Récapitulatif de commande</div>
+
+              <div class="summary-line">
+                <span class="summary-key">Sous-total <span id="summary-qty" class="summary-qty-label"></span></span>
+                <span class="summary-val" id="summary-subtotal">—</span>
+              </div>
+              <div class="summary-line" id="discount-line" style="display:none">
+                <span class="summary-key discount-key">🏷️ Réduction</span>
+                <span class="summary-val discount-val" id="summary-discount">—</span>
+              </div>
+              <div class="summary-line">
+                <span class="summary-key">Livraison <span id="summary-wilaya-name" class="wilaya-name"></span></span>
+                <span class="summary-val" id="summary-shipping">Sélectionnez une wilaya</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-line total-line">
+                <span class="summary-key">TOTAL</span>
+                <span class="summary-val total-val" id="summary-total">—</span>
+              </div>
+            </div>
+
+            <!-- ── Submit Button ──────────────────────── -->
+            <button type="submit" class="cta-btn" id="cta-btn">
+              <span class="cta-text">Confirmer la commande 🚀</span>
+              <span class="cta-loader" aria-hidden="true"></span>
+            </button>
+
+            <div class="form-footer-note">
+              🔒 Vos données sont protégées · Paiement à la livraison uniquement
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+      <!-- /product-info -->
+
+    </div>
+    <!-- /product-layout -->
+  </main>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">◆ <span id="footer-brand">Boutique</span></div>
+      <p class="footer-copy">© 2025 · Livraison partout en Algérie · Paiement à la livraison</p>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════
+       SUCCESS MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h2 class="modal-heading" id="modal-heading">Commande Confirmée !</h2>
+      <p class="modal-body">
+        Merci <strong id="modal-customer-name"></strong> ! Votre commande a été reçue avec succès.
+        Notre équipe vous contactera sous 24h au numéro que vous avez fourni pour confirmer la livraison.
+      </p>
+      <div class="modal-order-id">
+        Référence : <span id="modal-order-id"></span>
+      </div>
+      <button class="modal-close-btn" id="modal-close-btn">Fermer</button>
+    </div>
   </div>
 
-  <div class="total-box">
-    <div class="total-label">المجموع + التوصيل</div>
-    <div class="total-price" id="totalDisplay">1,900 DA</div>
-  </div>
-
-  <div class="form-group">
-    <label>الاسم الأول</label>
-    <input type="text" id="firstName" placeholder="مثال: أمين">
-  </div>
-  <div class="form-group">
-    <label>رقم الهاتف</label>
-    <input type="tel" id="phone" placeholder="06XXXXXXXX أو 07XXXXXXXX">
-  </div>
-  <div class="form-group">
-    <label>الولاية</label>
-    <select id="wilaya" onchange="updateTotal()">
-      <option value="">-- اختر الولاية --</option>
-      <option value="Adrar|400">01 - أدرار</option>
-      <option value="Chlef|350">02 - الشلف</option>
-      <option value="Laghouat|400">03 - الأغواط</option>
-      <option value="Oum El Bouaghi|350">04 - أم البواقي</option>
-      <option value="Batna|350">05 - باتنة</option>
-      <option value="Béjaïa|350">06 - بجاية</option>
-      <option value="Biskra|400">07 - بسكرة</option>
-      <option value="Béchar|450">08 - بشار</option>
-      <option value="Blida|300">09 - البليدة</option>
-      <option value="Bouira|300">10 - البويرة</option>
-      <option value="Tamanrasset|500">11 - تمنراست</option>
-      <option value="Tébessa|400">12 - تبسة</option>
-      <option value="Tlemcen|400">13 - تلمسان</option>
-      <option value="Tiaret|400">14 - تيارت</option>
-      <option value="Tizi Ouzou|300">15 - تيزي وزو</option>
-      <option value="Alger|300">16 - الجزائر</option>
-      <option value="Djelfa|400">17 - الجلفة</option>
-      <option value="Jijel|350">18 - جيجل</option>
-      <option value="Sétif|350">19 - سطيف</option>
-      <option value="Saïda|400">20 - سعيدة</option>
-      <option value="Skikda|350">21 - سكيكدة</option>
-      <option value="Sidi Bel Abbès|400">22 - سيدي بلعباس</option>
-      <option value="Annaba|350">23 - عنابة</option>
-      <option value="Guelma|350">24 - قالمة</option>
-      <option value="Constantine|350">25 - قسنطينة</option>
-      <option value="Médéa|300">26 - المدية</option>
-      <option value="Mostaganem|400">27 - مستغانم</option>
-      <option value="M'Sila|350">28 - المسيلة</option>
-      <option value="Mascara|400">29 - معسكر</option>
-      <option value="Ouargla|450">30 - ورقلة</option>
-      <option value="Oran|400">31 - وهران</option>
-      <option value="El Bayadh|450">32 - البيض</option>
-      <option value="Illizi|550">33 - إليزي</option>
-      <option value="Bordj Bou Arréridj|350">34 - برج بوعريريج</option>
-      <option value="Boumerdès|300">35 - بومرداس</option>
-      <option value="El Tarf|350">36 - الطارف</option>
-      <option value="Tindouf|550">37 - تندوف</option>
-      <option value="Tissemsilt|400">38 - تيسمسيلت</option>
-      <option value="El Oued|450">39 - الوادي</option>
-      <option value="Khenchela|400">40 - خنشلة</option>
-      <option value="Souk Ahras|350">41 - سوق أهراس</option>
-      <option value="Tipaza|300">42 - تيبازة</option>
-      <option value="Mila|350">43 - ميلة</option>
-      <option value="Aïn Defla|350">44 - عين الدفلى</option>
-      <option value="Naâma|450">45 - النعامة</option>
-      <option value="Aïn Témouchent|400">46 - عين تموشنت</option>
-      <option value="Ghardaïa|450">47 - غرداية</option>
-      <option value="Relizane|400">48 - غليزان</option>
-      <option value="Timimoun|500">49 - تيميمون</option>
-      <option value="Bordj Badji Mokhtar|550">50 - برج باجي مختار</option>
-      <option value="Ouled Djellal|450">51 - أولاد جلال</option>
-      <option value="Béni Abbès|500">52 - بني عباس</option>
-      <option value="In Salah|500">53 - عين صالح</option>
-      <option value="In Guezzam|550">54 - عين قزام</option>
-      <option value="Touggourt|450">55 - تقرت</option>
-      <option value="Djanet|550">56 - جانت</option>
-      <option value="El M'Ghair|450">57 - المغير</option>
-      <option value="El Meniaa|500">58 - المنيعة</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label>البلدية</label>
-    <input type="text" id="commune" placeholder="اسم البلدية">
-  </div>
-
-  <button class="order-btn" id="orderBtn" onclick="submitOrder()">
-    🛒 اطلب الآن — الدفع عند الاستلام
-  </button>
-
-  <div class="success-msg" id="successMsg">
-    <div class="icon">✅</div>
-    <h3>تم استلام طلبك!</h3>
-    <p>سيتصل بك فريقنا قريباً لتأكيد الطلب 🚀</p>
-    <p style="margin-top:8px;color:#c9a227;font-weight:bold" id="orderSummary"></p>
-  </div>
-</div>
-
-<div class="trust">
-  <div class="trust-item"><span>🚚</span><span>توصيل لكل الجزائر</span></div>
-  <div class="trust-item"><span>💳</span><span>الدفع عند الاستلام</span></div>
-  <div class="trust-item"><span>🔄</span><span>ضمان استبدال</span></div>
-  <div class="trust-item"><span>📦</span><span>تغليف فاخر</span></div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-let selectedColor = 'Transparent';
-let selectedQty = 1;
-let selectedProductPrice = 1900;
-let shippingFee = 0;
-
-function selectImg(el) {
-  document.querySelectorAll('.gallery img').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-}
-function selectColor(el, color) {
-  document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedColor = color;
-}
-function selectBundle(el, qty, price) {
-  document.querySelectorAll('.bundle').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedQty = qty;
-  selectedProductPrice = price;
-  updateTotal();
-}
-function updateTotal() {
-  const val = document.getElementById('wilaya').value;
-  shippingFee = val ? parseInt(val.split('|')[1]) : 0;
-  const total = selectedProductPrice + shippingFee;
-  document.getElementById('totalDisplay').textContent = total.toLocaleString('fr-DZ') + ' DA';
-}
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-function submitOrder() {
-  const firstName = document.getElementById('firstName').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const wilayaVal = document.getElementById('wilaya').value;
-  const commune = document.getElementById('commune').value.trim();
-  if (!firstName) { showToast('⚠️ أدخل اسمك'); return; }
-  if (!phone || !/^(05|06|07)\d{8}$/.test(phone)) { showToast('⚠️ رقم الهاتف غير صحيح'); return; }
-  if (!wilayaVal) { showToast('⚠️ اختر الولاية'); return; }
-  if (!commune) { showToast('⚠️ أدخل البلدية'); return; }
-  const btn = document.getElementById('orderBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ جاري إرسال الطلب...';
-  const wilayaName = wilayaVal.split('|')[0];
-  const total = selectedProductPrice + shippingFee;
-  fetch('/api/orders', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ firstName, phone, wilaya: wilayaName, commune, color: selectedColor, qty: selectedQty, productPrice: selectedProductPrice, shippingFee, totalPrice: total })
-  })
-  .then(r => r.json())
-  .catch(() => ({}))
-  .finally(() => {
-    document.getElementById('successMsg').style.display = 'block';
-    document.getElementById('orderSummary').textContent = selectedQty + ' قطعة (' + selectedColor + ') — ' + total.toLocaleString('fr-DZ') + ' DA — ' + wilayaName;
-    btn.style.display = 'none';
-    window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-  });
-}
-</script>
+  <!-- ══════════════════════════════════════
+       Scripts
+  ══════════════════════════════════════ -->
+  <script src="app.js"></script>
 </body>
 </html>
