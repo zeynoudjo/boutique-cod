@@ -21,13 +21,13 @@ const CONFIG = {
     subtitle: 'ضد الأشعة الزرقاء • UV400 • 4 مواسم 🔥',
     basePrice: 1900,
     currency: 'DA',
-    colors: ['Transparent', 'Platine', 'Gold'],
-    images: {
-      'Transparent': 'https://i.imgur.com/YOUR_TRANSPARENT.jpg',
-      'Platine':     'https://i.imgur.com/YOUR_PLATINE.jpg',
-      'Gold':        'https://i.imgur.com/YOUR_GOLD.jpg',
-    }
-  },
+ colors: ['Transparent', 'Platine', 'Gold'],
+imageUrl: 'https://i.imgur.com/7vIr21J.jpg',
+images: {
+  'Transparent': 'https://i.imgur.com/7vIr21J.jpg',
+  'Platine':     'https://i.imgur.com/7vIr21J.jpg',
+  'Gold':        'https://i.imgur.com/7vIr21J.jpg',
+}
   bundles: [
     { qty: 1, price: 1900,  saving: 0,   label: '1 قطعة', badge: null },
     { qty: 2, price: 3800,  saving: 0,   label: '2 قطع',  badge: null },
