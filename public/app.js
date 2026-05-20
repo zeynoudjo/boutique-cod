@@ -1,408 +1,385 @@
-/**
- * ============================================================
- *  COD E-Commerce — app.js
- *  Frontend logic: config hydration, pricing, variants, submit
- * ============================================================
- */
-
 'use strict';
 
-/* ── State ──────────────────────────────────────────────────── */
+/* ── State ───────────────────────────────────────────────────── */
 const STATE = {
-  config:        null,   // Loaded from /api/config
-  selectedBundle: 0,     // Index into config.bundles
-  selectedColor:  null,
-  selectedSize:   null,
+  config:       null,
+  selectedQty:  1,
+  selectedColor: null,
 };
 
-/* ── DOM References ──────────────────────────────────────────── */
+/* ── DOM ─────────────────────────────────────────────────────── */
 const $ = id => document.getElementById(id);
 
-const EL = {
-  headerBrand:      $('header-brand'),
-  footerBrand:      $('footer-brand'),
-  heroImage:        $('product-image'),
-  heroBadge:        $('hero-badge'),
-  productTitle:     $('product-title'),
-  productSubtitle:  $('product-subtitle'),
-  displayPrice:     $('display-price'),
-  bundleGrid:       $('bundle-grid'),
-  colorButtons:     $('color-buttons'),
-  sizeButtons:      $('size-buttons'),
-  selectedColor:    $('selected-color'),
-  selectedSize:     $('selected-size'),
-  wilayaSelect:     $('wilaya'),
-  commune:          $('commune'),
-  firstName:        $('firstName'),
-  phone:            $('phone'),
-  summaryQty:       $('summary-qty'),
-  summarySubtotal:  $('summary-subtotal'),
-  summaryDiscount:  $('summary-discount'),
-  discountLine:     $('discount-line'),
-  summaryShipping:  $('summary-shipping'),
-  summaryWilaya:    $('summary-wilaya-name'),
-  summaryTotal:     $('summary-total'),
-  checkoutForm:     $('checkout-form'),
-  ctaBtn:           $('cta-btn'),
-  successModal:     $('success-modal'),
-  modalClose:       $('modal-close-btn'),
-  modalCustomer:    $('modal-customer-name'),
-  modalOrderId:     $('modal-order-id'),
-};
+/* ── Format price ────────────────────────────────────────────── */
+const fmt = n => Number(n).toLocaleString('fr-DZ') + ' DA';
 
-/* ── Formatters ──────────────────────────────────────────────── */
-const fmt = n => n.toLocaleString('fr-DZ') + ' DZD';
-
-/* ── 1. Fetch config from backend ────────────────────────────── */
+/* ── Load config ─────────────────────────────────────────────── */
 async function loadConfig() {
   try {
     const r = await fetch('/api/config');
-    if (!r.ok) throw new Error('Config fetch failed');
     STATE.config = await r.json();
     hydratePage();
-  } catch (err) {
-    console.error('Failed to load config:', err);
-    document.body.innerHTML = `<div style="padding:40px;text-align:center;color:#f00">
-      Impossible de charger la page. Vérifiez que le serveur est démarré.
-    </div>`;
+  } catch (e) {
+    document.body.innerHTML = '<p style="color:red;padding:40px;text-align:center">خطأ في تحميل الصفحة</p>';
   }
 }
 
-/* ── 2. Hydrate the page with config data ────────────────────── */
+/* ── Build page ──────────────────────────────────────────────── */
 function hydratePage() {
-  const { product, bundles, shippingFees } = STATE.config;
+  const { product, shippingFees } = STATE.config;
 
-  // Brand / Title
-  EL.headerBrand.textContent = product.title;
-  EL.footerBrand.textContent = product.title;
-  EL.productTitle.textContent = product.title;
-  EL.productSubtitle.textContent = product.subtitle;
-  document.title = product.title + ' — Livraison Algérie';
+  // Titles
+  document.title = product.title;
+  const els = ['header-brand','footer-brand','product-title'];
+  els.forEach(id => { if($(id)) $(id).textContent = product.title; });
+  if($('product-subtitle')) $('product-subtitle').textContent = product.subtitle;
 
-  // Hero image
-  EL.heroImage.src = product.imageUrl;
-  EL.heroImage.alt = product.title;
+  // Hero image — default first color
+  STATE.selectedColor = product.colors[0];
+  updateHeroImage();
 
-  // Initial price display
-  EL.displayPrice.textContent = fmt(product.basePrice);
+  // Price
+  if($('display-price')) $('display-price').textContent = fmt(product.basePrice);
 
-  // ── Bundle cards ─────────────────────────────────────────
-  EL.bundleGrid.innerHTML = '';
+  // ── Quantity selector ──────────────────────────────────────
+  buildQtySelector();
 
-  bundles.forEach((bundle, idx) => {
-    const unitPrice  = product.basePrice * (1 - bundle.discountPct / 100);
-    const totalPrice = unitPrice * bundle.qty;
-    const isMostPopular = idx === 1; // 2-piece is "most popular"
-
-    const card = document.createElement('div');
-    card.className = 'bundle-card' + (idx === 0 ? ' active' : '');
-    card.dataset.idx = idx;
-    card.setAttribute('role', 'radio');
-    card.setAttribute('aria-checked', idx === 0 ? 'true' : 'false');
-    card.setAttribute('tabindex', '0');
-
-    card.innerHTML = `
-      ${isMostPopular ? '<div class="bundle-most-popular">⭐ Plus populaire</div>' : ''}
-      <div class="bundle-radio">
-        <div class="bundle-radio-dot"></div>
-      </div>
-      <div class="bundle-info">
-        <span class="bundle-qty">${bundle.label}</span>
-        <span class="bundle-price">${fmt(totalPrice)}${bundle.qty > 1 ? ` (${fmt(unitPrice)}/pièce)` : ''}</span>
-      </div>
-      ${bundle.badge ? `<span class="bundle-badge">${bundle.badge}</span>` : ''}
-    `;
-
-    card.addEventListener('click', () => selectBundle(idx));
-    card.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectBundle(idx); }
+  // ── Color buttons ──────────────────────────────────────────
+  const colorWrap = $('color-buttons');
+  if (colorWrap) {
+    colorWrap.innerHTML = '';
+    product.colors.forEach((color, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'variant-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = color;
+      btn.addEventListener('click', () => {
+        STATE.selectedColor = color;
+        // Update selected label
+        if($('selected-color')) $('selected-color').textContent = color;
+        // Update active button
+        colorWrap.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Swap image
+        updateHeroImage();
+      });
+      colorWrap.appendChild(btn);
     });
+    if($('selected-color')) $('selected-color').textContent = product.colors[0];
+  }
 
-    EL.bundleGrid.appendChild(card);
-  });
+  // Hide size section — not needed
+  const sizeSection = $('size-buttons');
+  if (sizeSection) {
+    const sizeGroup = sizeSection.closest('.variant-group');
+    if (sizeGroup) sizeGroup.style.display = 'none';
+  }
 
-  // ── Color buttons ─────────────────────────────────────────
-  EL.colorButtons.innerHTML = '';
-  product.colors.forEach((color, i) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'variant-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = color;
-    btn.addEventListener('click', () => selectColor(color));
-    EL.colorButtons.appendChild(btn);
-  });
-  selectColor(product.colors[0]);
+  // ── Wilaya select ──────────────────────────────────────────
+  const wilayaEl = $('wilaya');
+  if (wilayaEl && shippingFees) {
+    wilayaEl.innerHTML = '<option value="">اختر ولايتك</option>';
+    Object.keys(shippingFees).sort().forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w;
+      opt.textContent = `${w} — ${fmt(shippingFees[w])}`;
+      wilayaEl.appendChild(opt);
+    });
+    wilayaEl.addEventListener('change', updateSummary);
+  }
 
-  // ── Size buttons ──────────────────────────────────────────
-  EL.sizeButtons.innerHTML = '';
-  product.sizes.forEach((size, i) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'variant-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = size;
-    btn.addEventListener('click', () => selectSize(size));
-    EL.sizeButtons.appendChild(btn);
-  });
-  selectSize(product.sizes[0]);
+  updateSummary();
+  setupForm();
+}
 
-  // ── Wilaya select ─────────────────────────────────────────
-  EL.wilayaSelect.innerHTML = '<option value="">Sélectionnez votre wilaya</option>';
-  Object.keys(shippingFees).sort().forEach(w => {
-    const opt = document.createElement('option');
-    opt.value = w;
-    opt.textContent = `${w} — ${fmt(shippingFees[w])}`;
-    EL.wilayaSelect.appendChild(opt);
-  });
+/* ── Quantity selector (+ / -) ───────────────────────────────── */
+function buildQtySelector() {
+  const wrap = $('bundle-grid');
+  if (!wrap) return;
 
-  // ── Init summary ──────────────────────────────────────────
-  selectBundle(0);
+  const { product } = STATE.config;
+
+  wrap.innerHTML = `
+    <div class="qty-selector">
+      <button type="button" class="qty-btn" id="qty-minus">−</button>
+      <div class="qty-display">
+        <span id="qty-value">1</span>
+        <span class="qty-label">قطعة</span>
+      </div>
+      <button type="button" class="qty-btn" id="qty-plus">+</button>
+    </div>
+    <div class="qty-price-display" id="qty-price-display">${fmt(product.basePrice)}</div>
+    <div class="qty-promo" id="qty-promo" style="display:none">
+      🔥 3 قطع بـ <strong>5,250 DA</strong> بدل 5,700 DA — <span style="color:#00cc66">وفر 450 DA</span>
+    </div>
+  `;
+
+  $('qty-minus').addEventListener('click', () => changeQty(-1));
+  $('qty-plus').addEventListener('click',  () => changeQty(+1));
+}
+
+function changeQty(delta) {
+  const newQty = Math.max(1, Math.min(10, STATE.selectedQty + delta));
+  STATE.selectedQty = newQty;
+
+  if($('qty-value')) $('qty-value').textContent = newQty;
+
+  const { product } = STATE.config;
+
+  // Special price for 3
+  let totalPrice;
+  if (newQty === 3) {
+    totalPrice = 5250;
+    if($('qty-promo')) $('qty-promo').style.display = 'block';
+  } else {
+    totalPrice = product.basePrice * newQty;
+    if($('qty-promo')) $('qty-promo').style.display = 'none';
+  }
+
+  if($('qty-price-display')) $('qty-price-display').textContent = fmt(totalPrice);
+  if($('display-price'))     $('display-price').textContent     = fmt(totalPrice);
+
   updateSummary();
 }
 
-/* ── 3. Bundle Selection ─────────────────────────────────────── */
-function selectBundle(idx) {
-  STATE.selectedBundle = idx;
-
-  // Update card UI
-  document.querySelectorAll('.bundle-card').forEach((card, i) => {
-    const isActive = i === idx;
-    card.classList.toggle('active', isActive);
-    card.setAttribute('aria-checked', isActive ? 'true' : 'false');
-  });
-
-  updateSummary();
+/* ── Compute current product price ───────────────────────────── */
+function getProductPrice() {
+  const { product } = STATE.config;
+  const qty = STATE.selectedQty;
+  if (qty === 3) return 5250;
+  return product.basePrice * qty;
 }
 
-/* ── 4. Variant Selectors ─────────────────────────────────────── */
-function selectColor(color) {
-  STATE.selectedColor = color;
-  EL.selectedColor.textContent = color;
+/* ── Update hero image based on color ────────────────────────── */
+function updateHeroImage() {
+  const { product } = STATE.config;
+  const img = $('product-image');
+  if (!img) return;
 
-  document.querySelectorAll('#color-buttons .variant-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === color);
-  });
+  // Use color-specific image if available, else default
+  const images = product.images || {};
+  const src = images[STATE.selectedColor] || product.imageUrl || '';
+  if (src && src !== 'undefined') img.src = src;
 }
 
-function selectSize(size) {
-  STATE.selectedSize = size;
-  EL.selectedSize.textContent = size;
-
-  document.querySelectorAll('#size-buttons .variant-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === size);
-  });
-}
-
-/* ── 5. Dynamic Order Summary ─────────────────────────────────── */
+/* ── Update order summary ────────────────────────────────────── */
 function updateSummary() {
   if (!STATE.config) return;
 
-  const { product, bundles, shippingFees } = STATE.config;
-  const bundle      = bundles[STATE.selectedBundle];
-  const unitPrice   = product.basePrice * (1 - bundle.discountPct / 100);
-  const subtotal    = unitPrice * bundle.qty;
-  const wilaya      = EL.wilayaSelect.value;
-  const shipping    = wilaya ? (shippingFees[wilaya] || 0) : null;
-  const discount    = product.basePrice * bundle.qty - subtotal; // amount saved
-  const total       = shipping !== null ? subtotal + shipping : null;
+  const { shippingFees } = STATE.config;
+  const wilayaEl  = $('wilaya');
+  const wilaya    = wilayaEl ? wilayaEl.value : '';
+  const shipping  = wilaya && shippingFees ? (shippingFees[wilaya] || 0) : null;
+  const productPrice = getProductPrice();
+  const total     = shipping !== null ? productPrice + shipping : null;
 
-  // Hero price update
-  EL.displayPrice.textContent = fmt(subtotal);
-
-  // Summary lines
-  EL.summaryQty.textContent = `×${bundle.qty}`;
-  EL.summarySubtotal.textContent = fmt(subtotal);
-
-  // Discount line
-  if (bundle.discountPct > 0) {
-    EL.discountLine.style.display = 'flex';
-    EL.summaryDiscount.textContent = '−' + fmt(discount);
-  } else {
-    EL.discountLine.style.display = 'none';
-  }
-
-  // Shipping line
-  if (shipping !== null) {
-    EL.summaryShipping.textContent = fmt(shipping);
-    EL.summaryWilaya.textContent   = `(${wilaya})`;
-  } else {
-    EL.summaryShipping.textContent = 'Sélectionnez une wilaya';
-    EL.summaryWilaya.textContent   = '';
-  }
-
-  // Total
-  EL.summaryTotal.textContent = total !== null ? fmt(total) : '—';
-
-  // Badge image
-  if (bundle.discountPct > 0) {
-    EL.heroBadge.textContent = `−${bundle.discountPct}%`;
-    EL.heroBadge.style.background = '#16a34a';
-  } else {
-    EL.heroBadge.textContent = 'Nouveau';
-    EL.heroBadge.style.background = '';
+  // Hide the old summary section entirely — show only total
+  const summaryEl = $('order-summary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="summary-title">ملخص الطلب</div>
+      <div class="summary-line">
+        <span class="summary-key">المنتج × ${STATE.selectedQty}</span>
+        <span class="summary-val">${fmt(productPrice)}</span>
+      </div>
+      <div class="summary-line">
+        <span class="summary-key">التوصيل ${wilaya ? '(' + wilaya + ')' : ''}</span>
+        <span class="summary-val">${shipping !== null ? fmt(shipping) : 'اختر الولاية'}</span>
+      </div>
+      ${STATE.selectedQty === 3 ? `
+      <div class="summary-line" style="color:#00cc66;font-size:13px">
+        <span>🔥 تخفيض</span>
+        <span>− 450 DA</span>
+      </div>` : ''}
+      <div class="summary-divider"></div>
+      <div class="summary-line total-line">
+        <span class="summary-key" style="font-weight:800;font-size:15px">الإجمالي</span>
+        <span class="summary-val total-val">${total !== null ? fmt(total) : '—'}</span>
+      </div>
+    `;
   }
 }
 
-// Re-calculate whenever wilaya changes
-EL.wilayaSelect.addEventListener('change', updateSummary);
+/* ── Form setup & submit ─────────────────────────────────────── */
+function setupForm() {
+  const form = $('checkout-form');
+  if (!form) return;
 
-/* ── 6. Form Validation ──────────────────────────────────────── */
-function clearErrors() {
-  ['firstName', 'phone', 'wilaya', 'commune'].forEach(field => {
-    const el = $(`err-${field}`);
-    if (el) el.textContent = '';
-    const input = $(field);
-    if (input) input.classList.remove('is-error');
-  });
-}
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
 
-function showError(fieldId, msg) {
-  const errEl   = $(`err-${fieldId}`);
-  const inputEl = $(fieldId);
-  if (errEl)   errEl.textContent = msg;
-  if (inputEl) inputEl.classList.add('is-error');
-}
+    const firstName = $('firstName') ? $('firstName').value.trim() : '';
+    const phone     = $('phone')     ? $('phone').value.trim()     : '';
+    const wilaya    = $('wilaya')    ? $('wilaya').value            : '';
+    const commune   = $('commune')   ? $('commune').value.trim()   : '';
 
-function validateForm() {
-  clearErrors();
-  let valid = true;
+    // Validation
+    let valid = true;
+    if (firstName.length < 2) { showErr('firstName', 'الاسم قصير جداً'); valid = false; }
+    if (!/^(05|06|07)\d{8}$/.test(phone)) { showErr('phone', 'رقم غير صحيح — مثال: 0661234567'); valid = false; }
+    if (!wilaya) { showErr('wilaya', 'اختر ولايتك'); valid = false; }
+    if (commune.length < 2) { showErr('commune', 'أدخل البلدية'); valid = false; }
+    if (!valid) return;
 
-  const firstName = EL.firstName.value.trim();
-  const phone     = EL.phone.value.trim();
-  const wilaya    = EL.wilayaSelect.value;
-  const commune   = EL.commune.value.trim();
+    // Loading
+    const btn = $('cta-btn');
+    if (btn) { btn.disabled = true; btn.classList.add('loading'); }
 
-  if (firstName.length < 2) {
-    showError('firstName', 'Le prénom doit contenir au moins 2 caractères.');
-    valid = false;
-  }
+    const { shippingFees } = STATE.config;
+    const shippingFee  = wilaya ? (shippingFees[wilaya] || 0) : 0;
+    const productPrice = getProductPrice();
+    const totalPrice   = productPrice + shippingFee;
 
-  if (!/^(05|06|07)\d{8}$/.test(phone)) {
-    showError('phone', 'Numéro invalide — ex: 0661234567');
-    valid = false;
-  }
+    try {
+      const r = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName, phone, wilaya, commune,
+          color: STATE.selectedColor,
+          qty:   STATE.selectedQty,
+          productPrice,
+          shippingFee,
+          totalPrice,
+        }),
+      });
 
-  if (!wilaya) {
-    showError('wilaya', 'Veuillez sélectionner votre wilaya.');
-    valid = false;
-  }
+      const data = await r.json();
 
-  if (commune.length < 2) {
-    showError('commune', 'Commune invalide.');
-    valid = false;
-  }
-
-  return valid;
-}
-
-/* ── 7. Form Submission ──────────────────────────────────────── */
-EL.checkoutForm.addEventListener('submit', async e => {
-  e.preventDefault();
-
-  if (!validateForm()) {
-    // Scroll to first error
-    const firstErr = document.querySelector('.is-error');
-    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  // Loading state
-  setLoadingState(true);
-
-  const payload = {
-    firstName:   EL.firstName.value.trim(),
-    phone:       EL.phone.value.trim(),
-    wilaya:      EL.wilayaSelect.value,
-    commune:     EL.commune.value.trim(),
-    color:       STATE.selectedColor,
-    size:        STATE.selectedSize,
-    bundleIndex: STATE.selectedBundle,
-    totalPrice:  computeTotal(),
-  };
-
-  try {
-    const r = await fetch('/api/orders', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
-    });
-
-    const data = await r.json();
-
-    if (r.ok && data.success) {
-      showSuccessModal(payload.firstName, data.orderId);
-      EL.checkoutForm.reset();
-      updateSummary();
-    } else {
-      const msgs = data.errors ? data.errors.join('\n') : 'Une erreur est survenue. Réessayez.';
-      alert('❌ ' + msgs);
+      if (r.ok && data.success) {
+        // Show success modal
+        if($('modal-customer-name')) $('modal-customer-name').textContent = firstName;
+        if($('modal-order-id'))      $('modal-order-id').textContent      = data.orderId;
+        const modal = $('success-modal');
+        if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        form.reset();
+        STATE.selectedQty = 1;
+        buildQtySelector();
+        $('qty-minus').addEventListener('click', () => changeQty(-1));
+        $('qty-plus').addEventListener('click',  () => changeQty(+1));
+        updateSummary();
+      } else {
+        alert('❌ ' + (data.error || 'حدث خطأ، حاول مرة أخرى'));
+      }
+    } catch {
+      alert('❌ خطأ في الاتصال، تحقق من الإنترنت');
+    } finally {
+      if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
     }
-  } catch (err) {
-    alert('❌ Erreur réseau. Vérifiez votre connexion et réessayez.');
-    console.error(err);
-  } finally {
-    setLoadingState(false);
+  });
+
+  // Modal close
+  const modalClose = $('modal-close-btn');
+  const modal      = $('success-modal');
+  if (modalClose && modal) {
+    modalClose.addEventListener('click', () => {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+    });
   }
-});
 
-function computeTotal() {
-  if (!STATE.config) return 0;
-  const { product, bundles, shippingFees } = STATE.config;
-  const bundle    = bundles[STATE.selectedBundle];
-  const subtotal  = product.basePrice * bundle.qty * (1 - bundle.discountPct / 100);
-  const shipping  = shippingFees[EL.wilayaSelect.value] || 0;
-  return subtotal + shipping;
-}
-
-function setLoadingState(loading) {
-  const btn = EL.ctaBtn;
-  btn.disabled = loading;
-  btn.classList.toggle('loading', loading);
-}
-
-/* ── 8. Success Modal ────────────────────────────────────────── */
-function showSuccessModal(firstName, orderId) {
-  EL.modalCustomer.textContent = firstName;
-  EL.modalOrderId.textContent  = orderId;
-  EL.successModal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  EL.successModal.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-EL.modalClose.addEventListener('click', closeModal);
-
-EL.successModal.addEventListener('click', e => {
-  if (e.target === EL.successModal) closeModal();
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
-
-/* ── 9. Phone Input — auto-format / digits only ───────────────── */
-EL.phone.addEventListener('input', function () {
-  this.value = this.value.replace(/\D/g, '').slice(0, 10);
-});
-
-/* ── 10. Clear field errors on re-input ──────────────────────── */
-['firstName', 'phone', 'wilaya', 'commune'].forEach(id => {
-  const el = $(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    el.classList.remove('is-error');
-    const errEl = $(`err-${id}`);
-    if (errEl) errEl.textContent = '';
+  // Phone digits only
+  const phoneEl = $('phone');
+  if (phoneEl) phoneEl.addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
   });
-  el.addEventListener('change', () => {
-    el.classList.remove('is-error');
-    const errEl = $(`err-${id}`);
-    if (errEl) errEl.textContent = '';
-    if (id === 'wilaya') updateSummary();
+
+  // Clear errors on input
+  ['firstName','phone','wilaya','commune'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input',  () => clearErr(id));
+    el.addEventListener('change', () => clearErr(id));
   });
-});
+}
+
+function showErr(id, msg) {
+  const errEl = $('err-' + id);
+  const inpEl = $(id);
+  if (errEl) errEl.textContent = msg;
+  if (inpEl) inpEl.classList.add('is-error');
+}
+
+function clearErr(id) {
+  const errEl = $('err-' + id);
+  const inpEl = $(id);
+  if (errEl) errEl.textContent = '';
+  if (inpEl) inpEl.classList.remove('is-error');
+}
+
+/* ── Add qty selector styles ─────────────────────────────────── */
+const style = document.createElement('style');
+style.textContent = `
+.qty-selector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 2px solid var(--clr-border, #e8e5e0);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.qty-btn {
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
+  font-weight: 700;
+  background: #f5f5f0;
+  border: none;
+  cursor: pointer;
+  color: #1a1814;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.qty-btn:hover { background: #e8e5e0; }
+.qty-btn:active { background: #d0cdc8; }
+.qty-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-left: 2px solid #e8e5e0;
+  border-right: 2px solid #e8e5e0;
+}
+#qty-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a1814;
+  line-height: 1;
+}
+.qty-label {
+  font-size: 11px;
+  color: #9e9990;
+  margin-top: 2px;
+}
+.qty-price-display {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1814;
+  margin-top: 12px;
+  padding: 10px;
+  background: #fafaf8;
+  border: 1.5px solid #e8e5e0;
+  border-radius: 10px;
+}
+.qty-promo {
+  text-align: center;
+  font-size: 13px;
+  color: #f97316;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fff7ed;
+  border-radius: 8px;
+  border: 1px solid #fed7aa;
+}
+`;
+document.head.appendChild(style);
 
 /* ── Init ────────────────────────────────────────────────────── */
 loadConfig();
