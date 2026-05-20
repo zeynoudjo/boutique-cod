@@ -24,10 +24,11 @@ const CONFIG = {
     colors: ['Transparent', 'Platine', 'Gold'],
     imageUrl: 'https://i.ibb.co/jkxpP2ZX/CARTIER.jpg',
     images: {
-  'Transparent': 'https://i.ibb.co/jkxpP2ZX/CARTIER.jpg',
-  'Platine':     'https://i.ibb.co/mFg3FQCK/CARTIER-2.jpg',
-  'Gold':        'https://i.ibb.co/mFPdjXMr/CARTIER-1.jpg',
-},
+      'Transparent': 'https://i.ibb.co/jkxpP2ZX/CARTIER.jpg',
+      'Platine':     'https://i.ibb.co/mFg3FQCK/CARTIER-2.jpg',
+      'Gold':        'https://i.ibb.co/mFPdjXMr/CARTIER-1.jpg',
+    },
+  },
   bundles: [
     { qty: 1, price: 1900, saving: 0,   label: '1 قطعة', badge: null },
     { qty: 2, price: 3800, saving: 0,   label: '2 قطع',  badge: null },
